@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://csab8wrvwv55w"]
+
+[ext_resource type="Script" path="res://cell.gd" id="1_x0ubs"]
+
+[node name="Cell" type="CharacterBody2D"]
+script = ExtResource("1_x0ubs")
+growth_rate = 2.0
+max_size = 8.0
+cell_color = Color(0.474621, 0.74894, 0.455359, 1)
+velocity_damping_factor = 0.07
+move_speed = 15.0
+dish_size = 240.0
+
+[node name="Camera2D" type="Camera2D" parent="."]
