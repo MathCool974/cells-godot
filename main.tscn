@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dogsjqyi63rhi"]
 
-[ext_resource type="Script" path="res://main.gd" id="1_twv5w"]
+[ext_resource type="Script" uid="uid://dskighttde4oj" path="res://main.gd" id="1_twv5w"]
 [ext_resource type="PackedScene" uid="uid://csab8wrvwv55w" path="res://cell.tscn" id="2_l3l86"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("petri_dish_polygon")]
@@ -28,7 +28,13 @@ offset_top = -230.0
 offset_right = 497.0
 offset_bottom = -199.0
 
-[node name="Line2D" type="Line2D" parent="."]
-position = Vector2(250, 150)
+[node name="AxisX" type="Line2D" parent="."]
+position = Vector2(300, 150)
+
+[node name="AxisY" type="Line2D" parent="."]
+position = Vector2(300, 150)
+
+[node name="LinePlot" type="Line2D" parent="."]
+position = Vector2(300, 150)
 
 [node name="Cell" parent="." instance=ExtResource("2_l3l86")]

@@ -13,16 +13,26 @@ extends Node2D
 # Setting up for charting
 @onready var time_elapsed_label = $TimeLabel
 @onready var cell_count_label = $CountLabel # Optional label to show the number of cells
-@onready var line_chart = $Line2D  # Reference to the Line2D node
+@onready var line_chart = $LinePlot  # Reference to the Line2D node
+@onready var axis_x = $AxisX # x axis
+@onready var axis_y = $AxisY # y axis
 # Dynamic variables
 var time_elapsed: float = 0
 var next_plot_time: float = 0
 var data_points = []  # List to store the time and cell count data
+var axis_x_points = [Vector2(0,0), Vector2(500,0)]
+var axis_y_points = [Vector2(0,0), Vector2(0,-400)]
 
 func _ready():
 	# Settting up the chart
 	line_chart.width = line_chart_width
+	axis_x.width = line_chart_width
+	axis_y.width = line_chart_width
 	line_chart.default_color = line_chart_color
+	axis_x.default_color = Color.WHITE
+	axis_y.default_color = Color.WHITE
+	axis_x.points = axis_x_points
+	axis_y.points = axis_y_points
 	# Setting up the polygon shape
 	var radius = petri_dish_size  # Assuming a circular Petri dish
 	var points = [] 
