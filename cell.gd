@@ -8,6 +8,7 @@ extends CharacterBody2D
 @export var velocity_damping_factor: float = .1 # Dampin velocity so that cells don't fly off@
 @export var move_speed: float = 10 # Velocity of cell movement 
 @export var average_lifetime: float = 10.0  # λ: Average time before death (in seconds)
+@export var mutation_probability: float = .5
 # The dish parameters
 @export var dish_size: float = 300
 # Reference to the shape and collision shape of the cell
@@ -23,7 +24,9 @@ var cell_radius: float
 
 # Color gene
 var genes = {
-	"color": Color(0.2, 0.8, 0.2)  # Initial color gene
+	"color": Color(0.2, 0.8, 0.2),  # Initial color gene
+	"growth_rate": growth_rate,
+	"average_lifetime": average_lifetime
 }
 
 ####################################################################################################
@@ -99,11 +102,38 @@ func divide_cell():
 		# Create the new cells
 		var new_cell1 = cell_scene.instantiate()
 		var new_cell2 = cell_scene.instantiate()
+		# Inherit genes with a chance of mutation
+		new_cell1.genes = genes.duplicate()
+		new_cell2.genes = genes.duplicate()
 		# Set new properties for the cells
 		new_cell1.position = position + Vector2(randf_range(-10, 10), randf_range(-10, 10))
 		new_cell2.position = position + Vector2(randf_range(-10, 10), randf_range(-10, 10))
-		new_cell1.cell_color = mutate_color_gene()
-		new_cell2.cell_color = mutate_color_gene()
+		
+		# Mutate color gene 
+		if randf() < mutation_probability:
+			new_cell1.genes["color"] = mutate_color_gene(genes["color"])
+		if randf() < mutation_probability:
+			new_cell2.genes["color"] = mutate_color_gene(genes["color"])
+		# Apply the inherited/mutated color gene
+		new_cell1.cell_color = new_cell1.genes["color"]
+		new_cell2.cell_color = new_cell2.genes["color"]
+		# Mutate growth rate gene
+		if randf() < mutation_probability:
+			new_cell1.genes["growth_rate"] = mutate_growth_gene(genes["growth_rate"])
+		if randf() < mutation_probability:
+			new_cell2.genes["growth_rate"] = mutate_growth_gene(genes["growth_rate"])
+		# Apply the inherited/mutated color gene
+		new_cell1.growth_rate = new_cell1.genes["growth_rate"]
+		new_cell2.growth_rate = new_cell2.genes["growth_rate"]
+		# Mutate average lifetime
+		if randf() < mutation_probability:
+			new_cell1.genes["average_lifetime"] = mutate_growth_gene(genes["average_lifetime"])
+		if randf() < mutation_probability:
+			new_cell2.genes["average_lifetime"] = mutate_growth_gene(genes["average_lifetime"])
+		# Apply the inherited/mutated color gene
+		new_cell1.average_lifetime = new_cell1.genes["average_lifetime"]
+		new_cell2.average_lifetime = new_cell2.genes["average_lifetime"] 
+		
 		# Add the new cell instance as a child to the current scene
 		get_tree().current_scene.add_child(new_cell1)
 		get_tree().current_scene.add_child(new_cell2)
@@ -113,13 +143,23 @@ func divide_cell():
 	# Remove the original cell after division
 	queue_free()
 	
-func mutate_color_gene():
-	var mutated_color = cell_color
-	mutated_color.r += randf_range(-0.1, 0.1)
-	mutated_color.g += randf_range(-0.1, 0.1)
-	mutated_color.b += randf_range(-0.1, 0.1)
+func mutate_color_gene(original_color):
+	var mutated_color = original_color
+	mutated_color.r += randf_range(-0.3, 0.3)
+	mutated_color.g += randf_range(-0.3, 0.3)
+	mutated_color.b += randf_range(-0.3, 0.3)
 	# Ensure the color values stay within the valid range [0, 1]
 	mutated_color.r = clamp(mutated_color.r, 0.0, 1.0)
 	mutated_color.g = clamp(mutated_color.g, 0.0, 1.0)
 	mutated_color.b = clamp(mutated_color.b, 0.0, 1.0)
 	return mutated_color
+	
+func mutate_growth_gene(original_growth_rate):
+	var mutated_growth_rate = original_growth_rate
+	mutated_growth_rate += randf_range(-1, 1)
+	return mutated_growth_rate
+	
+func mutate_lifetime_gene(original_lifetime_rate):
+	var mutated_lifetime_rate = original_lifetime_rate
+	mutated_lifetime_rate += randf_range(-5, 5)
+	return mutated_lifetime_rate

@@ -8,6 +8,7 @@ script = ExtResource("1_twv5w")
 cell_scene = ExtResource("2_l3l86")
 petri_dish_polygon = NodePath("Polygon2D")
 plot_time_interval = 0.02
+line_chart_step_size = 5.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(300, 0)
@@ -39,4 +40,6 @@ position = Vector2(300, 150)
 
 [node name="Cell" parent="." instance=ExtResource("2_l3l86")]
 growth_rate = 1.0
+velocity_damping_factor = 0.1
+move_speed = 10.0
 average_lifetime = 20.0
