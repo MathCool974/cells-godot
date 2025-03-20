@@ -21,6 +21,11 @@ var cell_scene: PackedScene
 # Dynamic radius parameter for the cell 
 var cell_radius: float
 
+# Color gene
+var genes = {
+	"color": Color(0.2, 0.8, 0.2)  # Initial color gene
+}
+
 ####################################################################################################
 
 func _ready():
@@ -97,8 +102,8 @@ func divide_cell():
 		# Set new properties for the cells
 		new_cell1.position = position + Vector2(randf_range(-10, 10), randf_range(-10, 10))
 		new_cell2.position = position + Vector2(randf_range(-10, 10), randf_range(-10, 10))
-		new_cell1.cell_color = cell_color
-		new_cell2.cell_color = cell_color
+		new_cell1.cell_color = mutate_color_gene()
+		new_cell2.cell_color = mutate_color_gene()
 		# Add the new cell instance as a child to the current scene
 		get_tree().current_scene.add_child(new_cell1)
 		get_tree().current_scene.add_child(new_cell2)
@@ -107,3 +112,14 @@ func divide_cell():
 		queue_free()
 	# Remove the original cell after division
 	queue_free()
+	
+func mutate_color_gene():
+	var mutated_color = cell_color
+	mutated_color.r += randf_range(-0.1, 0.1)
+	mutated_color.g += randf_range(-0.1, 0.1)
+	mutated_color.b += randf_range(-0.1, 0.1)
+	# Ensure the color values stay within the valid range [0, 1]
+	mutated_color.r = clamp(mutated_color.r, 0.0, 1.0)
+	mutated_color.g = clamp(mutated_color.g, 0.0, 1.0)
+	mutated_color.b = clamp(mutated_color.b, 0.0, 1.0)
+	return mutated_color

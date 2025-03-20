@@ -1,11 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dogsjqyi63rhi"]
+[gd_scene load_steps=3 format=3 uid="uid://bwl6k5wbo2i2v"]
 
-[ext_resource type="Script" uid="uid://dskighttde4oj" path="res://main.gd" id="1_twv5w"]
-[ext_resource type="PackedScene" uid="uid://csab8wrvwv55w" path="res://cell.tscn" id="2_l3l86"]
+[ext_resource type="Script" uid="uid://dskighttde4oj" path="res://main.gd" id="1_tflds"]
+[ext_resource type="PackedScene" uid="uid://csab8wrvwv55w" path="res://cell.tscn" id="2_pdyu0"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("petri_dish_polygon")]
-script = ExtResource("1_twv5w")
-cell_scene = ExtResource("2_l3l86")
+script = ExtResource("1_tflds")
+cell_scene = ExtResource("2_pdyu0")
 petri_dish_polygon = NodePath("Polygon2D")
 plot_time_interval = 0.02
 
@@ -37,6 +37,6 @@ position = Vector2(300, 150)
 [node name="LinePlot" type="Line2D" parent="."]
 position = Vector2(300, 150)
 
-[node name="Cell" parent="." instance=ExtResource("2_l3l86")]
-growth_rate = 1.0
-average_lifetime = 20.0
+[node name="Cell" parent="." instance=ExtResource("2_pdyu0")]
+initial_radius = null
+max_size = null
