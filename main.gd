@@ -76,6 +76,21 @@ func _process(delta):
 		cell_count_label.text = "Cells: " + str(cell_count)
 		# Update the Line2D with the new data points
 		line_chart.points = data_points
+		
+		# Handle the cells behaviour
+		for cell in get_tree().get_nodes_in_group("cells"):
+			if cell.growth_rate > 0: # If the cell grows
+				cell.cell_radius += cell.growth_rate * delta  # Increase the radius over time
+				cell.update_cell_polygon()  # Update the polygon to match the new radius
+			# Adding a random velocity (Brownian motion sim)
+			cell.velocity += Vector2(1-2*randf(), 1-2*randf()) * cell.move_speed
+			# Damping the velocity
+			cell.velocity *= 1 - cell.velocity_damping_factor
+			# Make the cells stay in the dish
+			if cell.position.length() > cell.dish_size:
+				cell.position = cell.position.normalized() * cell.dish_size
+				cell.velocity = -.9*(cell.velocity.length()) * cell.position.normalized()
+		
 	
 func remove_trailing_zeros(value):
 	return value.rstrip("0").rstrip(".") if "." in value else value
@@ -94,6 +109,14 @@ func _on_start_button_pressed():
 
 func _on_pause_button_pressed():
 	simulation_is_running = not simulation_is_running
+	for cell in get_tree().get_nodes_in_group("cells"):
+		cell.stop_order = not simulation_is_running
+		if not simulation_is_running:
+			cell.death_timer.stop()
+			cell.division_timer.stop()
+		else:
+			cell.death_timer.start()
+			cell.division_timer.start()
 
 func _on_reset_button_pressed():
 	# Pause the simulation

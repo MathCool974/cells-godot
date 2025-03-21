@@ -6,10 +6,6 @@
 
 [node name="Cell" type="CharacterBody2D" node_paths=PackedStringArray("cell_polygon", "cell_collision", "death_timer", "division_timer")]
 script = ExtResource("1_x0ubs")
-growth_rate = 0.0
-max_size = 10.0
-cell_color = Color(0.474621, 0.74894, 0.455359, 1)
-average_lifetime = 15.0
 dish_size = 240.0
 cell_polygon = NodePath("Polygon2D")
 cell_collision = NodePath("CollisionShape2D")

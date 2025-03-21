@@ -2,14 +2,13 @@ extends CharacterBody2D
 
 # In editor cell parameters
 @export var initial_radius: float = 5.0  # Starting radius of the cell
-@export var growth_rate: float = 1.0  # Rate at which the cell grows per second
+@export var growth_rate: float = 0  # Rate at which the cell grows per second
 @export var max_size: float = 8.0  # Maximum size before division
-@export var cell_color: Color = Color(0.2, 0.8, 0.2)  # Cell color (green, for example)
+@export var cell_color: Color = Color.WHITE # Cell color (green, for example) Color(0.2, 0.8, 0.2)
 @export var velocity_damping_factor: float = .1 # Dampin velocity so that cells don't fly off@
 @export var move_speed: float = 10 # Velocity of cell movement 
 @export var average_lifetime: float = 10.0  # λ: Average time before death (in seconds)
 @export var division_time: float = 10 # Cells will divide after a given time
-@export var mutation_probability: float = .5
 # The dish parameters
 @export var dish_size: float = 300
 # Reference to the shape and collision shape of the cell
@@ -24,12 +23,13 @@ extends CharacterBody2D
 var cell_scene: PackedScene
 # Dynamic radius parameter for the cell 
 var cell_radius: float
+var stop_order: bool = false # order the cell to pause in time
 
 # The genes
 var genes = {
 	"division_time": division_time,
 	"average_lifetime": average_lifetime,
-	"growth_rate": growth_rate
+	"growth_rate": growth_rate,
 }
 var mutation_probabilities = {
 	"division_time": .5,
@@ -66,22 +66,9 @@ func _ready():
 	set_division_time()
 	set_growth_rate()
 
-func _process(delta):
-	if growth_rate > 0: # If the cell grows
-			cell_radius += growth_rate * delta  # Increase the radius over time
-			update_cell_polygon()  # Update the polygon to match the new radius
-	
-	# Adding a random velocity (Brownian motion sim)
-	velocity += Vector2(1-2*randf(), 1-2*randf()) * move_speed
-	# Damping the velocity
-	velocity *= 1 - velocity_damping_factor
-	# Make the cells stay in the dish
-	if position.length() > dish_size:
-		position = position.normalized() * dish_size
-		velocity = -.9*(velocity.length()) * position.normalized()
-
-	# We make sure they don't clip
-	move_and_slide()
+func _process(delta: float) -> void:
+	if not stop_order:
+		move_and_slide()
 
 ####################################################################################################
 
@@ -138,15 +125,18 @@ func divide_cell():
 				new_cell1.genes[gene] = mutate_gene(gene)
 			if randf() < mutation_probabilities[gene]:
 				new_cell2.genes[gene] = mutate_gene(gene)
+		
+		# Changing the color (same color = same genetic code)
+		#for cell in [new_cell1, new_cell2]:
+			#cell.cell_color = Color(genes["average_lifetime"]/50, genes["division_time"]/50, genes["growth_rate"]/5)
+		
 		# Add the new cell instance as a child to the current scene
 		get_tree().current_scene.add_child(new_cell1)
 		get_tree().current_scene.add_child(new_cell2)
 		
 		# Remove the original cell after division
 		queue_free()
-	# Remove the original cell after division
-	queue_free()
-	
+
 func mutate_gene(gene: String):
 	var mutated_gene = genes[gene]
 	mutated_gene += randf_range(-mutation_impacts[gene], mutation_impacts[gene])
