@@ -16,12 +16,17 @@ extends Node2D
 @onready var line_chart = $LinePlot  # Reference to the Line2D node
 @onready var axis_x = $AxisX # x axis
 @onready var axis_y = $AxisY # y axis
+@onready var init_cell_count_input = $InitCellNumb
+@onready var start_button = $SimulationControlLabel/StartButton
+@onready var pause_button = $SimulationControlLabel/PauseButton
+@onready var stop_button = $SimulationControlLabel/StopButton
 # Dynamic variables
 var time_elapsed: float = 0
 var next_plot_time: float = 0
 var data_points = []  # List to store the time and cell count data
 var axis_x_points = [Vector2(0,0), Vector2(500,0)]
 var axis_y_points = [Vector2(0,0), Vector2(0,-400)]
+var simulation_is_running: bool = false
 
 func _ready():
 	# Settting up the chart
@@ -43,28 +48,71 @@ func _ready():
 	petri_dish_polygon.polygon = points
 	# Set the color of the polygon (change to any color you like)
 	petri_dish_polygon.color = petri_dish_color
+	
+	# Connect the buttons' pressed signal
+	start_button.connect("pressed", Callable(self, "_on_start_button_pressed"))
+	pause_button.connect("pressed", Callable(self, "_on_pause_button_pressed"))
+	stop_button.connect("pressed", Callable(self, "_on_reset_button_pressed"))
 
 func _process(delta):
-	time_elapsed += delta # Counting the simulation time
-	# Counting the cells
-	var cell_count = get_tree().get_nodes_in_group("cells").size()
-	# Update label
-	cell_count_label.text = "Cell Count: " + str(cell_count)
-	# Adding the new data point
-	if time_elapsed > next_plot_time: # We add the points everyonce in a while to prevent overload
-		data_points.append(Vector2(time_elapsed*line_chart_step_size, -cell_count))
-		next_plot_time += plot_time_interval
+	if simulation_is_running:
+		time_elapsed += delta # Counting the simulation time
+		# Counting the cells
+		var cell_count = get_tree().get_nodes_in_group("cells").size()
+		# Update label
+		cell_count_label.text = "Cell Count: " + str(cell_count)
+		# Adding the new data point
+		if time_elapsed > next_plot_time: # We add the points everyonce in a while to prevent overload
+			data_points.append(Vector2(time_elapsed*line_chart_step_size, -cell_count))
+			next_plot_time += plot_time_interval
 
-	# Keep only the last points (up to limit) to prevent memory issues
-	if data_points.size() > point_number_memory:
-		data_points.pop_front()
+		# Keep only the last points (up to limit) to prevent memory issues
+		if data_points.size() > point_number_memory:
+			data_points.pop_front()
 
-	# Update the time label
-	time_elapsed_label.text = "Time: " + remove_trailing_zeros(str(float(int(time_elapsed*10))/10))
-	# Update the label to show the current number of cells
-	cell_count_label.text = "Cells: " + str(cell_count)
-	# Update the Line2D with the new data points
-	line_chart.points = data_points
+		# Update the time label
+		time_elapsed_label.text = "Time: " + remove_trailing_zeros(format_to_one_decimals(time_elapsed))
+		# Update the label to show the current number of cells
+		cell_count_label.text = "Cells: " + str(cell_count)
+		# Update the Line2D with the new data points
+		line_chart.points = data_points
 	
-func remove_trailing_zeros(s):
-	return s.rstrip("0").rstrip(".") if "." in s else s
+func remove_trailing_zeros(value):
+	return value.rstrip("0").rstrip(".") if "." in value else value
+func format_to_one_decimals(value):
+	return str(float(int(value * 10)) / 10)
+	
+func _on_start_button_pressed():
+	# Read the input value
+	var initial_cell_count = init_cell_count_input.text.to_int()
+	# Validate the input
+	if initial_cell_count <= 0:
+		print("Please enter a valid number of cells.")
+		return
+	# Start the simulation with the specified number of cells
+	start_simulation(initial_cell_count)
+
+func _on_pause_button_pressed():
+	simulation_is_running = not simulation_is_running
+
+func _on_reset_button_pressed():
+	# Pause the simulation
+	simulation_is_running = false
+	# Clear any existing cells
+	for cell in get_tree().get_nodes_in_group("cells"):
+		cell.queue_free()
+	# Reset simulation parameters
+	time_elapsed = 0
+	next_plot_time = 0
+	data_points = []
+
+func start_simulation(cell_count):
+	_on_reset_button_pressed()
+	# Create the initial cells
+	for useless_var in range(cell_count):
+		var new_cell = cell_scene.instantiate()
+		new_cell.position = Vector2(randf_range(-petri_dish_size, petri_dish_size), randf_range(-petri_dish_size, petri_dish_size))
+		add_child(new_cell)
+		new_cell.add_to_group("cells")
+	# Start the simulation logic
+	simulation_is_running = true

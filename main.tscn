@@ -22,12 +22,14 @@ offset_left = 342.0
 offset_top = -269.0
 offset_right = 497.0
 offset_bottom = -238.0
+text = "Time:"
 
 [node name="CountLabel" type="Label" parent="."]
 offset_left = 342.0
 offset_top = -230.0
 offset_right = 497.0
 offset_bottom = -199.0
+text = "Cells:"
 
 [node name="AxisX" type="Line2D" parent="."]
 position = Vector2(300, 150)
@@ -38,8 +40,49 @@ position = Vector2(300, 150)
 [node name="LinePlot" type="Line2D" parent="."]
 position = Vector2(300, 150)
 
-[node name="Cell" parent="." instance=ExtResource("2_l3l86")]
-growth_rate = 1.0
-velocity_damping_factor = 0.1
-move_speed = 10.0
-average_lifetime = 20.0
+[node name="InitCellNumbLabel" type="Label" parent="."]
+offset_left = -252.0
+offset_top = 268.0
+offset_right = -103.0
+offset_bottom = 291.0
+text = "Initial cell number: "
+
+[node name="InitCellNumb" type="LineEdit" parent="."]
+offset_left = -102.714
+offset_top = 263.968
+offset_right = -34.1518
+offset_bottom = 294.968
+text = "1"
+
+[node name="SimulationControlLabel" type="Label" parent="."]
+offset_top = 269.0
+offset_right = 88.0
+offset_bottom = 292.0
+text = "Simulation:"
+
+[node name="StartButton" type="Button" parent="SimulationControlLabel"]
+layout_mode = 0
+offset_left = 96.0
+offset_top = -2.0
+offset_right = 142.0
+offset_bottom = 29.0
+text = "Start
+"
+
+[node name="PauseButton" type="Button" parent="SimulationControlLabel"]
+layout_mode = 0
+offset_left = 157.0
+offset_top = -2.0
+offset_right = 203.0
+offset_bottom = 29.0
+text = "Pause / Unpause
+"
+
+[node name="StopButton" type="Button" parent="SimulationControlLabel"]
+layout_mode = 0
+offset_left = 312.0
+offset_top = -2.0
+offset_right = 367.0
+offset_bottom = 29.0
+text = "Reset
+"
