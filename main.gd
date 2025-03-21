@@ -21,6 +21,8 @@ extends Node2D
 @onready var start_button = $SimulationControlLabel/StartButton
 @onready var pause_button = $SimulationControlLabel/PauseButton
 @onready var stop_button = $SimulationControlLabel/StopButton
+#Static variables
+var petri_dish_buffer_size: float = 15 # buffer to prevent the cells from getting out of the dish
 # Dynamic variables
 var time_elapsed: float = 0
 var next_plot_time: float = 0
@@ -108,8 +110,8 @@ func _process(delta):
 						cell.velocity += force * delta
 			
 			# Make the cells stay in the dish
-			if cell.position.length() > cell.dish_size:
-				cell.position = cell.position.normalized() * cell.dish_size
+			if cell.position.length() > petri_dish_size - petri_dish_buffer_size:
+				cell.position = cell.position.normalized() * (petri_dish_size - petri_dish_buffer_size)
 				cell.velocity = -0.9 * (cell.velocity.length()) * cell.position.normalized()
 		
 	
