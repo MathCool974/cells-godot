@@ -21,6 +21,9 @@ extends CharacterBody2D
 
 # Reference to the cell scene (for the divide function)
 var cell_scene: PackedScene
+# Static variables
+var attraction_force: float = 200
+var repulsion_force:float = 200
 # Dynamic radius parameter for the cell 
 var cell_radius: float
 var stop_order: bool = false # order the cell to pause in time
@@ -32,9 +35,9 @@ var genes = {
 	"growth_rate": growth_rate,
 }
 var mutation_probabilities = {
-	"division_time": .5,
-	"average_lifetime": .5,
-	"growth_rate": .5
+	"division_time": .1,
+	"average_lifetime": .1,
+	"growth_rate": .1
 }
 var mutation_impacts = {
 	"division_time": 5, # Plus or Minus 5 seconds

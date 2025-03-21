@@ -8,6 +8,7 @@ script = ExtResource("1_twv5w")
 cell_scene = ExtResource("2_l3l86")
 petri_dish_polygon = NodePath("Polygon2D")
 plot_time_interval = 0.02
+line_chart_color = Color(0.593385, 0.93449, 0.401324, 1)
 line_chart_step_size = 5.0
 
 [node name="Camera2D" type="Camera2D" parent="."]

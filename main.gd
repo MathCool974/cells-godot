@@ -10,6 +10,7 @@ extends Node2D
 @export var line_chart_color: Color = Color(0.0, 1.0, 0.0)
 @export var line_chart_step_size: float = 10 # Set between each plot point (on x-axis)
 @export var point_number_memory: int = 3600 # 1min of 60fps, is that too much ?
+@export var influence_radius: float = 50
 # Setting up for charting
 @onready var time_elapsed_label = $TimeLabel
 @onready var cell_count_label = $CountLabel # Optional label to show the number of cells
@@ -77,19 +78,39 @@ func _process(delta):
 		# Update the Line2D with the new data points
 		line_chart.points = data_points
 		
-		# Handle the cells behaviour
+		# Handle the cells' behavior
 		for cell in get_tree().get_nodes_in_group("cells"):
-			if cell.growth_rate > 0: # If the cell grows
+			if cell.growth_rate > 0:  # If the cell grows
 				cell.cell_radius += cell.growth_rate * delta  # Increase the radius over time
 				cell.update_cell_polygon()  # Update the polygon to match the new radius
+
 			# Adding a random velocity (Brownian motion sim)
 			cell.velocity += Vector2(1-2*randf(), 1-2*randf()) * cell.move_speed
+
 			# Damping the velocity
 			cell.velocity *= 1 - cell.velocity_damping_factor
+
+			# Attraction and repulsion based on genetic similarity
+			for other_cell in get_tree().get_nodes_in_group("cells"):
+				if cell != other_cell:
+					var direction = (other_cell.position - cell.position).normalized()
+					var distance = cell.position.distance_to(other_cell.position)
+					if distance < influence_radius:
+						var force
+						# Define attraction and repulsion forces
+						if cell.genes == other_cell.genes:
+							# Attractive force
+							force = direction * cell.attraction_force
+						else:
+							# Repulsive force
+							force = -direction * cell.repulsion_force
+						# Apply the force to the cell's velocity
+						cell.velocity += force * delta
+			
 			# Make the cells stay in the dish
 			if cell.position.length() > cell.dish_size:
 				cell.position = cell.position.normalized() * cell.dish_size
-				cell.velocity = -.9*(cell.velocity.length()) * cell.position.normalized()
+				cell.velocity = -0.9 * (cell.velocity.length()) * cell.position.normalized()
 		
 	
 func remove_trailing_zeros(value):
